@@ -1,0 +1,52 @@
+{
+  "name": "playwright-js-atlas",
+  "version": "0.1.0",
+  "description": "Reusable TypeScript Playwright QA archetype for UI and API testing.",
+  "keywords": [
+    "qa",
+    "testing",
+    "playwright",
+    "typescript",
+    "archetype",
+    "ui",
+    "api"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "playwright test",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:ui": "playwright test --project=ui",
+    "test:api": "playwright test --project=api",
+    "test:e2e": "playwright test --project=e2e",
+    "test:headed": "playwright test --project=ui --headed",
+    "report": "playwright show-report reports/html",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run lint && npm run format:check && npm run typecheck"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "zod": "^3.23.8"
+  },
+  "optionalDependencies": {
+    "otplib": "^12.0.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.15.0",
+    "@faker-js/faker": "^9.2.0",
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^22.0.0",
+    "eslint": "^9.15.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.15.0"
+  }
+}
