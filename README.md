@@ -45,7 +45,7 @@ This is the TypeScript/JavaScript sibling of [playwright-pytest-atlas](../playwr
 
 ## Prerequisites
 
-- **Node.js 18+** (`node --version`)
+- **Node.js 20.19+** (`node --version`) — see [.nvmrc](.nvmrc) for the pinned version
 - **Git**
 
 ---
@@ -371,3 +371,7 @@ It's an optional dependency, normally installed by `npm install`. If you ran wit
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+---
+
+> Dependency modernization and review assisted by Claude (Anthropic Opus 4.8).

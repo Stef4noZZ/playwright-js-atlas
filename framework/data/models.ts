@@ -8,27 +8,23 @@ import { z } from "zod";
  * to validate API responses or factory output at the boundary.
  */
 
-export const AddressSchema = z
-  .object({
-    street: z.string(),
-    city: z.string(),
-    postalCode: z.string(),
-    country: z.string().default("US"),
-  })
-  .strict();
+export const AddressSchema = z.strictObject({
+  street: z.string(),
+  city: z.string(),
+  postalCode: z.string(),
+  country: z.string().default("US"),
+});
 
 export type Address = z.infer<typeof AddressSchema>;
 
-export const UserSchema = z
-  .object({
-    email: z.string(),
-    firstName: z.string(),
-    lastName: z.string(),
-    phone: z.string().optional(),
-    address: AddressSchema.optional(),
-    tags: z.array(z.string()).default([]),
-  })
-  .strict();
+export const UserSchema = z.strictObject({
+  email: z.string(),
+  firstName: z.string(),
+  lastName: z.string(),
+  phone: z.string().optional(),
+  address: AddressSchema.optional(),
+  tags: z.array(z.string()).default([]),
+});
 
 export type User = z.infer<typeof UserSchema>;
 

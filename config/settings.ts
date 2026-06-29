@@ -19,8 +19,8 @@ const boolFromEnv = z
 const SettingsSchema = z.object({
   environment: z.enum(["local", "dev", "staging", "prod"]).default("local"),
 
-  baseUrl: z.string().url().default("https://playwright.dev"),
-  apiBaseUrl: z.string().url().default("https://jsonplaceholder.typicode.com"),
+  baseUrl: z.url().default("https://playwright.dev"),
+  apiBaseUrl: z.url().default("https://jsonplaceholder.typicode.com"),
 
   browser: z.enum(["chromium", "firefox", "webkit"]).default("chromium"),
   headless: boolFromEnv.default(true),

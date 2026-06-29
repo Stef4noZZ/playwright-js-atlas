@@ -15,7 +15,7 @@
   "type": "module",
   "private": true,
   "engines": {
-    "node": ">=18"
+    "node": ">=20.19"
   },
   "scripts": {
     "test": "playwright test",
@@ -32,21 +32,21 @@
     "check": "npm run lint && npm run format:check && npm run typecheck"
   },
   "dependencies": {
-    "dotenv": "^16.4.5",
-    "zod": "^3.23.8"
+    "dotenv": "^17.4.2",
+    "zod": "^4.4.3"
   },
   "optionalDependencies": {
     "otplib": "^12.0.1"
   },
   "devDependencies": {
-    "@eslint/js": "^9.15.0",
-    "@faker-js/faker": "^9.2.0",
-    "@playwright/test": "^1.49.0",
-    "@types/node": "^22.0.0",
-    "eslint": "^9.15.0",
-    "eslint-config-prettier": "^9.1.0",
-    "prettier": "^3.3.3",
-    "typescript": "^5.6.0",
-    "typescript-eslint": "^8.15.0"
+    "@eslint/js": "^10.0.1",
+    "@faker-js/faker": "^10.5.0",
+    "@playwright/test": "^1.61.1",
+    "@types/node": "^26.0.1",
+    "eslint": "^10.6.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.3",
+    "typescript": "^5.9.0",
+    "typescript-eslint": "^8.62.0"
   }
 }
