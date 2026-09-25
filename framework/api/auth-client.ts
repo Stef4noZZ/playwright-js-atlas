@@ -9,7 +9,12 @@
 
 import type { APIRequestContext } from "@playwright/test";
 
-import { generateTotp, isOtpAvailable } from "@framework/auth/otp";
+import {
+  generateTotp,
+  isOtpAvailable,
+  secondsUntilNextWindow,
+  type OtpAlgorithm,
+} from "@framework/auth/otp";
 import { TokenCache, type Token } from "@framework/auth/token-cache";
 import { getLogger, type Logger } from "@framework/utils/logger";
 
@@ -17,7 +22,6 @@ type FormPayload = Record<string, string | number | boolean>;
 
 export class AuthClient {
   static readonly OTP_MAX_ATTEMPTS = 3;
-  static readonly OTP_WINDOW_SLEEP_MS = 31_000;
 
   protected readonly request: APIRequestContext;
   protected readonly tokenUrl: string;
@@ -42,8 +46,15 @@ export class AuthClient {
   }
 
   /** Return a Token, using the cache when valid and OTP retries when required. */
-  authenticate(username: string, password: string, otpSecret?: string): Promise<Token> {
-    return this.cache.getOrFetch(() => this.fetchToken(username, password, otpSecret));
+  authenticate(
+    username: string,
+    password: string,
+    otpSecret?: string,
+    otpAlgorithm: OtpAlgorithm = "SHA1",
+  ): Promise<Token> {
+    return this.cache.getOrFetch(() =>
+      this.fetchToken(username, password, otpSecret, otpAlgorithm),
+    );
   }
 
   /** Best-effort logout. Pass the matching OIDC logout endpoint via `logoutUrl`. */
@@ -67,27 +78,30 @@ export class AuthClient {
     username: string,
     password: string,
     otpSecret?: string,
+    otpAlgorithm: OtpAlgorithm = "SHA1",
   ): Promise<Token> {
     let lastError: Error | null = null;
 
     for (let attempt = 0; attempt < AuthClient.OTP_MAX_ATTEMPTS; attempt++) {
       if (attempt > 0 && otpSecret) {
-        await sleep(AuthClient.OTP_WINDOW_SLEEP_MS);
+        await sleep(secondsUntilNextWindow() * 1000);
       }
 
-      const payload = await this.buildPayload(username, password, otpSecret);
+      const payload = await this.buildPayload(username, password, otpSecret, otpAlgorithm);
       const response = await this.request.post(this.tokenUrl, { form: payload });
 
       if (response.ok()) {
         const body = (await response.json()) as {
           access_token: string;
           refresh_token?: string;
+          expires_in?: number;
         };
-        this.log.info("api_login_success", { username });
+        this.log.info("api_login_success");
         return {
           accessToken: body.access_token,
           refreshToken: body.refresh_token,
           issuedAt: 0,
+          expiresIn: body.expires_in,
         };
       }
 
@@ -107,7 +121,8 @@ export class AuthClient {
   protected async buildPayload(
     username: string,
     password: string,
-    otpSecret?: string,
+    otpSecret: string | undefined,
+    otpAlgorithm: OtpAlgorithm,
   ): Promise<FormPayload> {
     const payload: FormPayload = {
       username,
@@ -121,7 +136,7 @@ export class AuthClient {
           "OTP secret provided but otplib is not installed. Install with: npm install otplib",
         );
       }
-      payload.otp = await generateTotp(otpSecret);
+      payload.otp = await generateTotp(otpSecret, otpAlgorithm);
     }
     return payload;
   }

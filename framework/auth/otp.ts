@@ -21,10 +21,16 @@ export async function isOtpAvailable(): Promise<boolean> {
   return (await loadOtplib()) !== null;
 }
 
+/** Seconds to wait so the next TOTP attempt falls in a new time step. */
+export function secondsUntilNextWindow(periodSeconds = 30, nowMs = Date.now()): number {
+  const elapsed = (nowMs / 1000) % periodSeconds;
+  return periodSeconds - elapsed + 1;
+}
+
 /** Return the current TOTP code for the given base32 secret. */
 export async function generateTotp(
   secret: string,
-  algorithm: OtpAlgorithm = "SHA512",
+  algorithm: OtpAlgorithm = "SHA1",
 ): Promise<string> {
   const otplib = await loadOtplib();
   if (otplib === null) {
@@ -32,10 +38,14 @@ export async function generateTotp(
   }
 
   const { authenticator } = otplib;
-  // otplib's `HashAlgorithms` enum values are the lowercased strings; cast
-  // through `unknown` since the enum is nominal and not re-exported top-level.
+  const previous = { ...authenticator.options };
   authenticator.options = {
+    ...previous,
     algorithm: algorithm.toLowerCase() as unknown as (typeof authenticator)["options"]["algorithm"],
   };
-  return authenticator.generate(secret);
+  try {
+    return authenticator.generate(secret);
+  } finally {
+    authenticator.options = previous;
+  }
 }

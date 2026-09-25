@@ -11,6 +11,9 @@ on:
         type: string
         default: "@smoke"
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -45,13 +48,51 @@ jobs:
         env:
           QA_BROWSER: ${{ matrix.browser }}
           QA_HEADLESS: "true"
-        run: npx playwright test --grep "${{ github.event.inputs.grep || '@smoke' }}"
+          PLAYWRIGHT_GREP: ${{ github.event.inputs.grep || '@smoke' }}
+          RUN_ALL_PROJECTS: ${{ github.event_name == 'workflow_dispatch' && 'true' || 'false' }}
+        run: |
+          if [ "$RUN_ALL_PROJECTS" = "true" ]; then
+            npx playwright test --grep "$PLAYWRIGHT_GREP"
+          else
+            npx playwright test --project=ui --grep "$PLAYWRIGHT_GREP"
+          fi
 
       - name: Upload reports
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: reports-${{ matrix.browser }}
+          path: reports/
+          retention-days: 14
+
+  api:
+    name: api smoke
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run API smoke tests
+        env:
+          QA_HEADLESS: "true"
+        run: npx playwright test --project=api --grep @smoke
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: reports-api
           path: reports/
           retention-days: 14
 
@@ -80,3 +121,6 @@ jobs:
 
       - name: Type check
         run: npm run typecheck
+
+      - name: Unit tests
+        run: npm run test:unit

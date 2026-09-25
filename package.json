@@ -15,7 +15,7 @@
   "type": "module",
   "private": true,
   "engines": {
-    "node": ">=20.19"
+    "node": ">=22"
   },
   "scripts": {
     "test": "playwright test",
@@ -29,6 +29,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
+    "test:unit": "node --experimental-strip-types --test tests/unit/*.test.ts",
     "check": "npm run lint && npm run format:check && npm run typecheck"
   },
   "dependencies": {

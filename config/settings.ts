@@ -39,6 +39,7 @@ const SettingsSchema = z.object({
   username: z.string().optional(),
   password: z.string().optional(),
   otpSecret: z.string().optional(),
+  otpAlgorithm: z.enum(["SHA1", "SHA256", "SHA512"]).default("SHA1"),
 
   // OAuth2 / OIDC. `authTokenUrl` is the full token endpoint, e.g.
   // https://{host}/auth/realms/{realm}/protocol/openid-connect/token
@@ -75,6 +76,7 @@ function load(): Settings {
     username: clean(e.QA_USERNAME),
     password: clean(e.QA_PASSWORD),
     otpSecret: clean(e.QA_OTP_SECRET),
+    otpAlgorithm: clean(e.QA_OTP_ALGORITHM),
     authTokenUrl: clean(e.QA_AUTH_TOKEN_URL),
     authLogoutUrl: clean(e.QA_AUTH_LOGOUT_URL),
     authClientId: clean(e.QA_AUTH_CLIENT_ID),

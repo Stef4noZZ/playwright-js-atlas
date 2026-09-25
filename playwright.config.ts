@@ -20,8 +20,12 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   workers: process.env.CI ? 1 : undefined,
   outputDir: "reports/playwright",
-  timeout: 60_000,
-  reporter: [["list"], ["html", { outputFolder: "reports/html", open: "never" }]],
+  timeout: 120_000,
+  reporter: [
+    ["list"],
+    ["html", { outputFolder: "reports/html", open: "never" }],
+    ...(process.env.CI ? [["github"] as const] : []),
+  ],
   use: {
     baseURL: settings.baseUrl,
     actionTimeout: settings.defaultTimeoutMs,

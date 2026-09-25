@@ -6,10 +6,13 @@
  * `framework/auth/token_cache.py` in the pytest atlas.
  */
 
+const EXPIRY_SKEW_MS = 30_000;
+
 export interface Token {
   accessToken: string;
   refreshToken?: string;
   issuedAt: number;
+  expiresIn?: number;
 }
 
 export class TokenCache {
@@ -21,10 +24,12 @@ export class TokenCache {
   }
 
   isValid(): boolean {
-    if (this.token === null) {
+    if (this.token === null || this.token.issuedAt <= 0) {
       return false;
     }
-    return Date.now() - this.token.issuedAt < this.ttlMs;
+    const lifetimeMs =
+      this.token.expiresIn !== undefined ? this.token.expiresIn * 1000 : this.ttlMs;
+    return Date.now() - this.token.issuedAt < Math.max(lifetimeMs - EXPIRY_SKEW_MS, 0);
   }
 
   async getOrFetch(fetcher: () => Promise<Token>): Promise<Token> {
@@ -36,6 +41,7 @@ export class TokenCache {
       accessToken: fetched.accessToken,
       refreshToken: fetched.refreshToken,
       issuedAt: Date.now(),
+      expiresIn: fetched.expiresIn,
     };
     return this.token;
   }

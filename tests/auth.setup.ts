@@ -32,6 +32,7 @@ setup("authenticate", async ({ page }) => {
     username: settings.username,
     password: settings.password,
     otpSecret: settings.otpSecret,
+    otpAlgorithm: settings.otpAlgorithm,
   });
   await page.context().storageState({ path: STORAGE_STATE });
 });

@@ -96,6 +96,7 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
         settings.username!,
         settings.password!,
         settings.otpSecret,
+        settings.otpAlgorithm,
       );
       await use(token);
       await authClient!.logout(token, settings.authLogoutUrl);
@@ -120,6 +121,7 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
       username: settings.username!,
       password: settings.password!,
       otpSecret: settings.otpSecret,
+      otpAlgorithm: settings.otpAlgorithm,
     });
     await use(login);
     await login.logout();

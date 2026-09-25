@@ -45,7 +45,7 @@ This is the TypeScript/JavaScript sibling of [playwright-pytest-atlas](../playwr
 
 ## Prerequisites
 
-- **Node.js 20.19+** (`node --version`) — see [.nvmrc](.nvmrc) for the pinned version
+- **Node.js 22+** (`node --version`) — see [.nvmrc](.nvmrc) for the pinned version
 - **Git**
 
 ---
@@ -169,6 +169,7 @@ All runtime settings are env-driven with the `QA_` prefix, validated by Zod in [
 | `QA_RECORD_VIDEO`          | `false`                                | Record videos for every test         |
 | `QA_RECORD_TRACE`          | `retain-on-failure`                    | `off` / `on` / `retain-on-failure`   |
 | `QA_CAPTURE_SCREENSHOT`    | `only-on-failure`                      | `off` / `on` / `only-on-failure`     |
+| `QA_OTP_ALGORITHM`         | `SHA1`                                 | `SHA1`, `SHA256`, or `SHA512`        |
 
 Auth-related variables (all optional) are documented in [.env.example](.env.example) and below.
 
@@ -330,8 +331,9 @@ npm run check          # all three
 
 [.github/workflows/tests.yml](.github/workflows/tests.yml) runs on every push and pull request:
 
-- **`test` job**: matrix across Chromium / Firefox / WebKit. Runs the `@smoke` suite by default, with one automatic retry on flake.
-- **`lint` job**: ESLint + Prettier check + `tsc`.
+- **`test` job**: matrix across Chromium / Firefox / WebKit. Runs `@smoke` in the `ui` project.
+- **`api` job**: `@smoke` API tests once, outside the browser matrix.
+- **`lint` job**: ESLint + Prettier check + `tsc` + unit tests.
 
 Reports are uploaded as build artifacts (`reports-chromium`, etc.) with 14-day retention. Trigger an ad-hoc run with a custom tag expression via the **Actions** tab → **tests** → **Run workflow**.
 
